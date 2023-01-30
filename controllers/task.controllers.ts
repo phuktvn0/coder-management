@@ -8,7 +8,6 @@ import {
   updatedTaskQuerySchema,
 } from "./task.validators";
 import Task from "../models/Task";
-import { any } from "joi";
 
 //Create a Task
 export async function createTask(
@@ -97,7 +96,7 @@ export async function updateTaskById(
     if (idUser) {
       const task = await Task.findById(id);
       if (!task) {
-        throw createError(httpStatus.NOT_FOUND, " Task not found!");
+        throw createError(httpStatus.NOT_FOUND, "Task not found!");
       }
       // console.log(task.assignee == idUser);
       if (task.assignee == idUser) {
@@ -110,7 +109,7 @@ export async function updateTaskById(
           },
         };
         return res.status(200).send(responseData);
-      } else {
+      } else if (task.assignee == null) {
         task.assignee = idUser;
         task.save();
         const responseData = {
@@ -120,6 +119,8 @@ export async function updateTaskById(
           },
         };
         return res.status(200).send(responseData);
+      } else {
+        throw createError(httpStatus.BAD_REQUEST, "Task not have 2 employee!");
       }
     }
 
